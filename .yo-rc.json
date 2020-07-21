@@ -1,0 +1,44 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "edu.buaa",
+      "nativeLanguage": "zh-cn"
+    },
+    "jhipsterVersion": "6.5.1",
+    "applicationType": "microservice",
+    "baseName": "gdata",
+    "packageName": "edu.buaa",
+    "packageFolder": "edu/buaa",
+    "serverPort": "8086",
+    "authenticationType": "jwt",
+    "cacheProvider": "no",
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "mysql",
+    "prodDatabaseType": "mysql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": "consul",
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "OTQ2NDM5MzBlZGUyZGMxY2QzNzdmYTcyOGEzMzI3MmE0MzQzY2FiYWRkYTRiMDY0MzRhOTBmMGRmNzBhNzIwYjJlODliNmNjYjY3MjFhZWE5NDUwNGUyY2MzNjE5ZGU3OTc0N2E2Mjg0ZTc1YjE5OGE0NTg0MGE4NmZmYWJjZmY=",
+    "embeddableLaunchScript": false,
+    "testFrameworks": [
+      "gatling"
+    ],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": true,
+    "clientPackageManager": "npm",
+    "nativeLanguage": "zh-cn",
+    "languages": [
+      "zh-cn",
+      "en"
+    ],
+    "blueprints": [],
+    "skipClient": true,
+    "skipUserManagement": true
+  }
+}
