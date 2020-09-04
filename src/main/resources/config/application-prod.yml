@@ -131,6 +131,7 @@ jhipster:
         # - In a separate `application-prod.yml` file, in the same folder as your executable JAR file
         # - In the `JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET` environment variable
         base64-secret: OTQ2NDM5MzBlZGUyZGMxY2QzNzdmYTcyOGEzMzI3MmE0MzQzY2FiYWRkYTRiMDY0MzRhOTBmMGRmNzBhNzIwYjJlODliNmNjYjY3MjFhZWE5NDUwNGUyY2MzNjE5ZGU3OTc0N2E2Mjg0ZTc1YjE5OGE0NTg0MGE4NmZmYWJjZmY=
+
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
