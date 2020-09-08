@@ -85,7 +85,7 @@ public class EsinfoResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final EsinfoResource esinfoResource = new EsinfoResource(esinfoService, esinfoQueryService);
+        final EsinfoResource esinfoResource = new EsinfoResource(esinfoService, esinfoQueryService,esinfoRepository);
         this.restEsinfoMockMvc = MockMvcBuilders.standaloneSetup(esinfoResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

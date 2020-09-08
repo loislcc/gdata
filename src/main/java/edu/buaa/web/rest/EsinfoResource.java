@@ -1,6 +1,7 @@
 package edu.buaa.web.rest;
 
 import edu.buaa.domain.Esinfo;
+import edu.buaa.repository.EsinfoRepository;
 import edu.buaa.service.EsinfoService;
 import edu.buaa.web.rest.errors.BadRequestAlertException;
 import edu.buaa.service.dto.EsinfoCriteria;
@@ -39,9 +40,12 @@ public class EsinfoResource {
 
     private final EsinfoQueryService esinfoQueryService;
 
-    public EsinfoResource(EsinfoService esinfoService, EsinfoQueryService esinfoQueryService) {
+    private final EsinfoRepository esinfoRepository;
+
+    public EsinfoResource(EsinfoService esinfoService, EsinfoQueryService esinfoQueryService, EsinfoRepository esinfoRepository) {
         this.esinfoService = esinfoService;
         this.esinfoQueryService = esinfoQueryService;
+        this.esinfoRepository = esinfoRepository;
     }
 
     /**
@@ -137,5 +141,12 @@ public class EsinfoResource {
         log.debug("REST request to delete Esinfo : {}", id);
         esinfoService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    }
+
+    @PostMapping("/esinfos/findByname")
+    public List<Esinfo> findEsinfo(@RequestBody String pname) throws URISyntaxException {
+        log.debug("REST request to find Esinfo bypname : {}", pname);
+        Optional<List<Esinfo>> optionalEsinfoList = esinfoRepository.findAllByPname(pname);
+        return optionalEsinfoList.orElse(null);
     }
 }
