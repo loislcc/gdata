@@ -17,6 +17,7 @@
     <include file="config/liquibase/changelog/20200721040242_added_entity_Esinfo.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200904082916_added_entity_Loginfo.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200908070644_added_entity_Task.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200908083514_added_entity_Maprelation.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

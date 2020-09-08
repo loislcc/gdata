@@ -1,0 +1,32 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "gdata",
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "vnode",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "rnode",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "status",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "size",
+            "fieldType": "Double"
+        }
+    ],
+    "changelogDate": "20200908083514",
+    "dto": "no",
+    "searchEngine": false,
+    "service": "serviceClass",
+    "entityTableName": "maprelation",
+    "databaseType": "sql",
+    "jpaMetamodelFiltering": true,
+    "pagination": "pagination",
+    "microserviceName": "gdata"
+}
