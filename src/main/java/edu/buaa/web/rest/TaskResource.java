@@ -1,6 +1,11 @@
 package edu.buaa.web.rest;
 
+import com.alibaba.fastjson.JSONObject;
+import edu.buaa.domain.Cycletask;
 import edu.buaa.domain.Task;
+import edu.buaa.repository.CycletaskRepository;
+import edu.buaa.repository.TaskRepository;
+import edu.buaa.service.CycletaskService;
 import edu.buaa.service.TaskService;
 import edu.buaa.web.rest.errors.BadRequestAlertException;
 import edu.buaa.service.dto.TaskCriteria;
@@ -43,9 +48,15 @@ public class TaskResource {
 
     private final TaskQueryService taskQueryService;
 
-    public TaskResource(TaskService taskService, TaskQueryService taskQueryService) {
+    private final CycletaskService cycletaskService;
+
+    private final CycletaskRepository cycletaskRepository;
+
+    public TaskResource(TaskService taskService, TaskQueryService taskQueryService, CycletaskService cycletaskService, CycletaskRepository cycletaskRepository) {
         this.taskService = taskService;
         this.taskQueryService = taskQueryService;
+        this.cycletaskService = cycletaskService;
+        this.cycletaskRepository = cycletaskRepository;
     }
 
     /**
@@ -141,5 +152,45 @@ public class TaskResource {
         log.debug("REST request to delete Task : {}", id);
         taskService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    }
+
+    @PostMapping("/tasks/add")
+    public ResponseEntity<JSONObject> importTask(@RequestBody JSONObject jsonObject) throws Exception {
+        log.debug("REST request to add taskinfo : {}", jsonObject);
+        Task task = new Task();
+        task.setChecknum(jsonObject.getString("checknum"));
+        task.setDatanum(jsonObject.getString("datanum"));
+        task.setMatrix(jsonObject.getString("matrix"));
+        task.setStartime(jsonObject.getString("startime"));
+        task.setEndtime(jsonObject.getString("endtime"));
+        task.setRealtime(jsonObject.getString("realtime"));
+        task.setName(jsonObject.getString("name"));
+        task.setType(jsonObject.getString("type"));
+        Task task1 = taskService.save(task);
+        if(task.getType().equals("cycle")) {
+            Cycletask cycletask = new Cycletask();
+            cycletask.setCycle(jsonObject.getString("cycle"));
+            cycletask.setName(task.getName());
+            cycletask.setTaskid(task1.getId());
+            log.debug("@@@@@@@:{}",task.getStartime());
+            cycletaskService.save(cycletask);
+//            cycletask.setNextime();
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/tasks/delete")
+    public ResponseEntity<JSONObject> deletetaskinfo(@RequestBody Long[] idlist) {
+        for (Long aLong : idlist) {
+            deleteTask(aLong);
+            Optional<Task> taskOptional = taskService.findOne(aLong);
+            if(taskOptional.isPresent()){
+                Task task = taskOptional.get();
+                if(task.getType().equals("cycle")){
+                    cycletaskRepository.deleteAllByTaskid(aLong);
+                }
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

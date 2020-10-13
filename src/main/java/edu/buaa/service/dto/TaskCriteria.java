@@ -38,6 +38,12 @@ public class TaskCriteria implements Serializable, Criteria {
 
     private StringFilter status;
 
+    private StringFilter datanum;
+
+    private StringFilter checknum;
+
+    private StringFilter matrix;
+
     public TaskCriteria(){
     }
 
@@ -49,6 +55,9 @@ public class TaskCriteria implements Serializable, Criteria {
         this.endtime = other.endtime == null ? null : other.endtime.copy();
         this.realtime = other.realtime == null ? null : other.realtime.copy();
         this.status = other.status == null ? null : other.status.copy();
+        this.datanum = other.datanum == null ? null : other.datanum.copy();
+        this.checknum = other.checknum == null ? null : other.checknum.copy();
+        this.matrix = other.matrix == null ? null : other.matrix.copy();
     }
 
     @Override
@@ -112,6 +121,30 @@ public class TaskCriteria implements Serializable, Criteria {
         this.status = status;
     }
 
+    public StringFilter getDatanum() {
+        return datanum;
+    }
+
+    public void setDatanum(StringFilter datanum) {
+        this.datanum = datanum;
+    }
+
+    public StringFilter getChecknum() {
+        return checknum;
+    }
+
+    public void setChecknum(StringFilter checknum) {
+        this.checknum = checknum;
+    }
+
+    public StringFilter getMatrix() {
+        return matrix;
+    }
+
+    public void setMatrix(StringFilter matrix) {
+        this.matrix = matrix;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -129,7 +162,10 @@ public class TaskCriteria implements Serializable, Criteria {
             Objects.equals(startime, that.startime) &&
             Objects.equals(endtime, that.endtime) &&
             Objects.equals(realtime, that.realtime) &&
-            Objects.equals(status, that.status);
+            Objects.equals(status, that.status) &&
+            Objects.equals(datanum, that.datanum) &&
+            Objects.equals(checknum, that.checknum) &&
+            Objects.equals(matrix, that.matrix);
     }
 
     @Override
@@ -141,7 +177,10 @@ public class TaskCriteria implements Serializable, Criteria {
         startime,
         endtime,
         realtime,
-        status
+        status,
+        datanum,
+        checknum,
+        matrix
         );
     }
 
@@ -155,6 +194,9 @@ public class TaskCriteria implements Serializable, Criteria {
                 (endtime != null ? "endtime=" + endtime + ", " : "") +
                 (realtime != null ? "realtime=" + realtime + ", " : "") +
                 (status != null ? "status=" + status + ", " : "") +
+                (datanum != null ? "datanum=" + datanum + ", " : "") +
+                (checknum != null ? "checknum=" + checknum + ", " : "") +
+                (matrix != null ? "matrix=" + matrix + ", " : "") +
             "}";
     }
 

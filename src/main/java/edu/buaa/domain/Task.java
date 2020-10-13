@@ -35,6 +35,15 @@ public class Task implements Serializable {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "datanum")
+    private String datanum;
+
+    @Column(name = "checknum")
+    private String checknum;
+
+    @Column(name = "matrix")
+    private String matrix;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -121,6 +130,45 @@ public class Task implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getDatanum() {
+        return datanum;
+    }
+
+    public Task datanum(String datanum) {
+        this.datanum = datanum;
+        return this;
+    }
+
+    public void setDatanum(String datanum) {
+        this.datanum = datanum;
+    }
+
+    public String getChecknum() {
+        return checknum;
+    }
+
+    public Task checknum(String checknum) {
+        this.checknum = checknum;
+        return this;
+    }
+
+    public void setChecknum(String checknum) {
+        this.checknum = checknum;
+    }
+
+    public String getMatrix() {
+        return matrix;
+    }
+
+    public Task matrix(String matrix) {
+        this.matrix = matrix;
+        return this;
+    }
+
+    public void setMatrix(String matrix) {
+        this.matrix = matrix;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -149,6 +197,9 @@ public class Task implements Serializable {
             ", endtime='" + getEndtime() + "'" +
             ", realtime='" + getRealtime() + "'" +
             ", status='" + getStatus() + "'" +
+            ", datanum='" + getDatanum() + "'" +
+            ", checknum='" + getChecknum() + "'" +
+            ", matrix='" + getMatrix() + "'" +
             "}";
     }
 }

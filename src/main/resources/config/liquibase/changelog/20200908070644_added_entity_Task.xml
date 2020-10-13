@@ -34,6 +34,15 @@
             <column name="status" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="datanum" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="checknum" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="matrix" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
     </changeSet>
@@ -63,6 +72,9 @@
             <column name="endtime" type="string"/>
             <column name="realtime" type="string"/>
             <column name="status" type="string"/>
+            <column name="datanum" type="string"/>
+            <column name="checknum" type="string"/>
+            <column name="matrix" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
         </loadData>
     </changeSet>

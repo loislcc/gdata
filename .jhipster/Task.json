@@ -26,6 +26,18 @@
         {
             "fieldName": "status",
             "fieldType": "String"
+        },
+        {
+            "fieldName": "datanum",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "checknum",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "matrix",
+            "fieldType": "String"
         }
     ],
     "changelogDate": "20200908070644",

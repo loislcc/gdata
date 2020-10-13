@@ -2,7 +2,9 @@ package edu.buaa.web.rest;
 
 import edu.buaa.GdataApp;
 import edu.buaa.domain.Task;
+import edu.buaa.repository.CycletaskRepository;
 import edu.buaa.repository.TaskRepository;
+import edu.buaa.service.CycletaskService;
 import edu.buaa.service.TaskService;
 import edu.buaa.web.rest.errors.ExceptionTranslator;
 import edu.buaa.service.dto.TaskCriteria;
@@ -64,6 +66,12 @@ public class TaskResourceIT {
     private TaskQueryService taskQueryService;
 
     @Autowired
+    private CycletaskService cycletaskService;
+
+    @Autowired
+    private CycletaskRepository cycletaskRepository;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -85,7 +93,7 @@ public class TaskResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final TaskResource taskResource = new TaskResource(taskService, taskQueryService);
+        final TaskResource taskResource = new TaskResource(taskService, taskQueryService, cycletaskService,cycletaskRepository);
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

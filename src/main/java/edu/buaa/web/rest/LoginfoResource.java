@@ -149,6 +149,14 @@ public class LoginfoResource {
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert( ENTITY_NAME, id.toString())).build();
     }
 
+    @PostMapping("/loginfos/delete")
+    public ResponseEntity<JSONObject> deleteloginfo(@RequestBody Long[] idlist) {
+        for (Long aLong : idlist) {
+            deleteLoginfo(aLong);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/loginfos/add")
     public ResponseEntity<JSONObject> importLog(@RequestBody JSONObject jsonObject) throws Exception {
         log.debug("REST request to add loginfo : {}", jsonObject);
