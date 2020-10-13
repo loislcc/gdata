@@ -182,14 +182,15 @@ public class TaskResource {
     @PostMapping("/tasks/delete")
     public ResponseEntity<JSONObject> deletetaskinfo(@RequestBody Long[] idlist) {
         for (Long aLong : idlist) {
-            deleteTask(aLong);
+
             Optional<Task> taskOptional = taskService.findOne(aLong);
             if(taskOptional.isPresent()){
                 Task task = taskOptional.get();
                 if(task.getType().equals("cycle")){
-                    cycletaskRepository.deleteAllByTaskid(aLong);
+                    cycletaskService.deletebytaskid(aLong);
                 }
             }
+            deleteTask(aLong);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }

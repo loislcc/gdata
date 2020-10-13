@@ -1,0 +1,36 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "gdata",
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "cycle",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "nextime",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "nextendtime",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "taskid",
+            "fieldType": "Long"
+        }
+    ],
+    "changelogDate": "20201011152159",
+    "dto": "no",
+    "searchEngine": false,
+    "service": "serviceClass",
+    "entityTableName": "cycletask",
+    "databaseType": "sql",
+    "jpaMetamodelFiltering": true,
+    "pagination": "pagination",
+    "microserviceName": "gdata"
+}
