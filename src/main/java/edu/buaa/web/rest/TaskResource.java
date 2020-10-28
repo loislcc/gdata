@@ -7,6 +7,7 @@ import edu.buaa.repository.CycletaskRepository;
 import edu.buaa.repository.TaskRepository;
 import edu.buaa.service.CycletaskService;
 import edu.buaa.service.TaskService;
+import edu.buaa.service.message.ToConsoleProducer;
 import edu.buaa.web.rest.errors.BadRequestAlertException;
 import edu.buaa.service.dto.TaskCriteria;
 import edu.buaa.service.TaskQueryService;
@@ -52,11 +53,15 @@ public class TaskResource {
 
     private final CycletaskRepository cycletaskRepository;
 
-    public TaskResource(TaskService taskService, TaskQueryService taskQueryService, CycletaskService cycletaskService, CycletaskRepository cycletaskRepository) {
+    private final ToConsoleProducer toConsoleProducer;
+
+    public TaskResource(TaskService taskService, TaskQueryService taskQueryService, CycletaskService cycletaskService,
+                        CycletaskRepository cycletaskRepository, ToConsoleProducer toConsoleProducer) {
         this.taskService = taskService;
         this.taskQueryService = taskQueryService;
         this.cycletaskService = cycletaskService;
         this.cycletaskRepository = cycletaskRepository;
+        this.toConsoleProducer = toConsoleProducer;
     }
 
     /**
@@ -192,6 +197,13 @@ public class TaskResource {
             }
             deleteTask(aLong);
         }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @PostMapping("/tasks/sendMsg")
+    public ResponseEntity<JSONObject> sendMsg(@RequestBody String str) throws Exception {
+        toConsoleProducer.sendMsgToGatewayConsole(str);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
