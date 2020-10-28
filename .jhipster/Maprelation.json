@@ -18,6 +18,14 @@
         {
             "fieldName": "size",
             "fieldType": "Double"
+        },
+        {
+            "fieldName": "lastime",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "ip",
+            "fieldType": "String"
         }
     ],
     "changelogDate": "20200908083514",

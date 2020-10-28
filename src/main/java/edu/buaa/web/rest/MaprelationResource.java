@@ -1,6 +1,7 @@
 package edu.buaa.web.rest;
 
 import edu.buaa.domain.Maprelation;
+import edu.buaa.repository.MaprelationRepository;
 import edu.buaa.service.MaprelationService;
 import edu.buaa.web.rest.errors.BadRequestAlertException;
 import edu.buaa.service.dto.MaprelationCriteria;
@@ -45,9 +46,12 @@ public class MaprelationResource {
 
     private final MaprelationQueryService maprelationQueryService;
 
-    public MaprelationResource(MaprelationService maprelationService, MaprelationQueryService maprelationQueryService) {
+    private final MaprelationRepository maprelationRepository;
+
+    public MaprelationResource(MaprelationService maprelationService, MaprelationQueryService maprelationQueryService, MaprelationRepository maprelationRepository) {
         this.maprelationService = maprelationService;
         this.maprelationQueryService = maprelationQueryService;
+        this.maprelationRepository = maprelationRepository;
     }
 
     /**
@@ -143,5 +147,10 @@ public class MaprelationResource {
         log.debug("REST request to delete Maprelation : {}", id);
         maprelationService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert( ENTITY_NAME, id.toString())).build();
+    }
+
+    @GetMapping("/maprelations/get")
+    public List<Maprelation> getMaprelations() {
+        return maprelationRepository.findAll();
     }
 }

@@ -1,6 +1,7 @@
 package edu.buaa.config;
 
 
+import edu.buaa.service.message.ShareChannel;
 import edu.buaa.service.message.ToConsoleChannel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -14,7 +15,7 @@ import org.springframework.cloud.stream.messaging.Source;
  * See http://docs.spring.io/spring-cloud-stream/docs/current/reference/htmlsingle/
  * for the official Spring Cloud Stream documentation.
  */
-@EnableBinding(value = { Source.class,ToConsoleChannel.class})
+@EnableBinding(value = { Source.class,ToConsoleChannel.class, ShareChannel.class})
 public class MessagingConfiguration {
 
     @Value("${spring.application.name:JhipsterService}")

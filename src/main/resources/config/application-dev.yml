@@ -50,6 +50,9 @@ spring:
         ToConsoleChannel:
           destination: console
           group: consoleDetection
+        ShareInChannel:
+          destination: amongedge
+        #                    group: edges    // 非持久队列
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://localhost:3306/gdata?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC

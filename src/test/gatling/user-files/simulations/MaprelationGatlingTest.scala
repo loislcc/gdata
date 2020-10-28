@@ -76,6 +76,8 @@ class MaprelationGatlingTest extends Simulation {
                 , "rnode":"SAMPLE_TEXT"
                 , "status":"SAMPLE_TEXT"
                 , "size":null
+                , "lastime":"SAMPLE_TEXT"
+                , "ip":"SAMPLE_TEXT"
                 }""")).asJson
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_maprelation_url"))).exitHereIfFailed

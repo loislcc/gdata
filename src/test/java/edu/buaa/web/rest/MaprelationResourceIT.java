@@ -80,7 +80,7 @@ public class MaprelationResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final MaprelationResource maprelationResource = new MaprelationResource(maprelationService, maprelationQueryService);
+        final MaprelationResource maprelationResource = new MaprelationResource(maprelationService, maprelationQueryService, maprelationRepository);
         this.restMaprelationMockMvc = MockMvcBuilders.standaloneSetup(maprelationResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

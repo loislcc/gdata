@@ -34,6 +34,10 @@ public class MaprelationCriteria implements Serializable, Criteria {
 
     private DoubleFilter size;
 
+    private StringFilter lastime;
+
+    private StringFilter ip;
+
     public MaprelationCriteria(){
     }
 
@@ -43,6 +47,8 @@ public class MaprelationCriteria implements Serializable, Criteria {
         this.rnode = other.rnode == null ? null : other.rnode.copy();
         this.status = other.status == null ? null : other.status.copy();
         this.size = other.size == null ? null : other.size.copy();
+        this.lastime = other.lastime == null ? null : other.lastime.copy();
+        this.ip = other.ip == null ? null : other.ip.copy();
     }
 
     @Override
@@ -90,6 +96,22 @@ public class MaprelationCriteria implements Serializable, Criteria {
         this.size = size;
     }
 
+    public StringFilter getLastime() {
+        return lastime;
+    }
+
+    public void setLastime(StringFilter lastime) {
+        this.lastime = lastime;
+    }
+
+    public StringFilter getIp() {
+        return ip;
+    }
+
+    public void setIp(StringFilter ip) {
+        this.ip = ip;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -105,7 +127,9 @@ public class MaprelationCriteria implements Serializable, Criteria {
             Objects.equals(vnode, that.vnode) &&
             Objects.equals(rnode, that.rnode) &&
             Objects.equals(status, that.status) &&
-            Objects.equals(size, that.size);
+            Objects.equals(size, that.size) &&
+            Objects.equals(lastime, that.lastime) &&
+            Objects.equals(ip, that.ip);
     }
 
     @Override
@@ -115,7 +139,9 @@ public class MaprelationCriteria implements Serializable, Criteria {
         vnode,
         rnode,
         status,
-        size
+        size,
+        lastime,
+        ip
         );
     }
 
@@ -127,6 +153,8 @@ public class MaprelationCriteria implements Serializable, Criteria {
                 (rnode != null ? "rnode=" + rnode + ", " : "") +
                 (status != null ? "status=" + status + ", " : "") +
                 (size != null ? "size=" + size + ", " : "") +
+                (lastime != null ? "lastime=" + lastime + ", " : "") +
+                (ip != null ? "ip=" + ip + ", " : "") +
             "}";
     }
 

@@ -29,6 +29,12 @@ public class Maprelation implements Serializable {
     @Column(name = "size")
     private Double size;
 
+    @Column(name = "lastime")
+    private String lastime;
+
+    @Column(name = "ip")
+    private String ip;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -89,6 +95,32 @@ public class Maprelation implements Serializable {
     public void setSize(Double size) {
         this.size = size;
     }
+
+    public String getLastime() {
+        return lastime;
+    }
+
+    public Maprelation lastime(String lastime) {
+        this.lastime = lastime;
+        return this;
+    }
+
+    public void setLastime(String lastime) {
+        this.lastime = lastime;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public Maprelation ip(String ip) {
+        this.ip = ip;
+        return this;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -115,6 +147,8 @@ public class Maprelation implements Serializable {
             ", rnode='" + getRnode() + "'" +
             ", status='" + getStatus() + "'" +
             ", size=" + getSize() +
+            ", lastime='" + getLastime() + "'" +
+            ", ip='" + getIp() + "'" +
             "}";
     }
 }
