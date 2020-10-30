@@ -5,6 +5,7 @@ import edu.buaa.domain.Task;
 import edu.buaa.repository.CycletaskRepository;
 import edu.buaa.repository.TaskRepository;
 import edu.buaa.service.CycletaskService;
+import edu.buaa.service.LoginfoService;
 import edu.buaa.service.TaskService;
 import edu.buaa.service.message.ToConsoleProducer;
 import edu.buaa.web.rest.errors.ExceptionTranslator;
@@ -75,6 +76,7 @@ public class TaskResourceIT {
     @Autowired
     private ToConsoleProducer toConsoleProducer;
 
+    private LoginfoService loginfoService;
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
@@ -97,7 +99,7 @@ public class TaskResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final TaskResource taskResource = new TaskResource(taskService, taskQueryService, cycletaskService,cycletaskRepository,toConsoleProducer);
+        final TaskResource taskResource = new TaskResource(taskService, taskQueryService, cycletaskService,cycletaskRepository,toConsoleProducer, loginfoService);
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

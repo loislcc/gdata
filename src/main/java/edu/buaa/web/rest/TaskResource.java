@@ -1,11 +1,15 @@
 package edu.buaa.web.rest;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import edu.buaa.domain.Constants;
 import edu.buaa.domain.Cycletask;
+import edu.buaa.domain.Loginfo;
 import edu.buaa.domain.Task;
 import edu.buaa.repository.CycletaskRepository;
 import edu.buaa.repository.TaskRepository;
 import edu.buaa.service.CycletaskService;
+import edu.buaa.service.LoginfoService;
 import edu.buaa.service.TaskService;
 import edu.buaa.service.message.ToConsoleProducer;
 import edu.buaa.web.rest.errors.BadRequestAlertException;
@@ -15,7 +19,15 @@ import edu.buaa.service.TaskQueryService;
 
 import edu.buaa.web.rest.util.HeaderUtil;
 import edu.buaa.web.rest.util.PaginationUtil;
+import edu.buaa.web.rest.util.utils;
 import io.github.jhipster.web.util.ResponseUtil;
+
+import io.swagger.models.auth.In;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.io.XMLWriter;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,15 +35,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.util.List;
-import java.util.Optional;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 
 /**
  * REST controller for managing {@link edu.buaa.domain.Task}.
@@ -55,13 +74,116 @@ public class TaskResource {
 
     private final ToConsoleProducer toConsoleProducer;
 
+    private final LoginfoService loginfoService;
+
+    private static final ForkJoinPool forkJoinPool = new ForkJoinPool();
+
+    private static Map<Long, TaskThread> taskMap = new ConcurrentHashMap<Long, TaskThread>();  // 在多线程环境下，使用HashMap进行put操作时存在丢失数据的情况，为了避免这种bug的隐患，强烈建议使用ConcurrentHashMap代替HashMap。
+
+
     public TaskResource(TaskService taskService, TaskQueryService taskQueryService, CycletaskService cycletaskService,
-                        CycletaskRepository cycletaskRepository, ToConsoleProducer toConsoleProducer) {
+                        CycletaskRepository cycletaskRepository, ToConsoleProducer toConsoleProducer,
+                        LoginfoService loginfoService) {
         this.taskService = taskService;
         this.taskQueryService = taskQueryService;
         this.cycletaskService = cycletaskService;
         this.cycletaskRepository = cycletaskRepository;
         this.toConsoleProducer = toConsoleProducer;
+        this.loginfoService = loginfoService;
+    }
+
+
+    public class TaskThread implements Runnable  {
+        private Task t;
+        private Vector<String> errRet;
+        private boolean waiting = false;
+
+
+        public TaskThread(Task t, Vector<String> errRet) {
+            this.t = t;
+            this.errRet = errRet;
+        }
+        public void run() {
+            System.out.println("执行任务线程...");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat day = new SimpleDateFormat("yyyy-MM-dd");
+            t.setStatus("running");
+            t.setRealtime(sdf.format(new Date()));
+            taskService.save(t);
+            toConsoleProducer.sendMsgToGatewayConsole("任务 " + t.getName() + " is running...");
+            // 处理日志信息成为文件
+            String startime = t.getStartime();
+            String endtime = t.getEndtime();
+            String path = "";
+            try {
+                List<Loginfo> loginfoList = loginfoService.findall(startime,endtime);                  // 获取指定范围内信息
+                if(loginfoList.size()!=0){
+                    File testDir = new File(Constants.filepath+day.format(new Date()));
+                    if (!testDir.isDirectory()) {
+                        testDir.mkdir();
+                    }
+                    path = Constants.filepath + day.format(new Date()) + "/" + t.getName()+".txt";         // 文件路径
+                    utils.FileWriteListneed(path,loginfoList);                                            // 写入文件
+                } else {
+                    taskService.delete(t.getId());
+                    toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " 没有相关信息可备份,该任务删除");
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                this.errRet.add("没有相关信息可备份,该任务删除");
+
+            } catch (Exception e) {
+                t.setStatus("fail");
+                taskService.save(t);
+                toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " 写入文件失败");
+            }
+            toConsoleProducer.sendMsgToGatewayConsole("成功写入文件: "+path);
+            if(isPause()){
+                t.setStatus("pause");
+                taskService.save(t);
+                toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " 任务已暂停");
+            }
+            // 编码
+
+            taskService.executeTask(t, path );
+
+            // 选择节点进行发送
+
+        }
+        public void pause() {
+            if (waiting) { // 是挂起状态则直接返回
+                return;
+            }
+            synchronized (this) {
+                this.waiting = true;
+            }
+        }
+
+        public void resume() {
+            if (!waiting) { // 没有挂起则直接返回
+                return;
+            }
+            synchronized (this) {
+                this.waiting = false;
+                this.notifyAll();
+            }
+        }
+
+        boolean isPause(){
+            // 暂停任务
+            try {
+                synchronized (this){
+                    if (waiting) {
+                        this.wait();
+                        return true;
+                    }
+                    return false;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
     }
 
     /**
@@ -171,8 +293,26 @@ public class TaskResource {
         task.setRealtime(jsonObject.getString("realtime"));
         task.setName(jsonObject.getString("name"));
         task.setType(jsonObject.getString("type"));
+        task.setStatus(jsonObject.getString("status"));
         Task task1 = taskService.save(task);
-        if(task.getType().equals("cycle")) {
+        if(!task.getType().equals("cycle")){
+            Vector<String> errRet = new Vector();
+            TaskThread thread= taskMap.get(task.getId());
+            if (thread == null) {
+                thread  = new TaskThread(task, errRet);
+                taskMap.put(task.getId(), thread);
+            }
+            forkJoinPool.execute(thread);
+            forkJoinPool.shutdown();
+            forkJoinPool.awaitTermination(1, TimeUnit.DAYS);
+
+            if (errRet.size() > 0) {
+                JSONObject result = new JSONObject();
+                result.put("errorinfo", "没有相关信息可备份,该任务删除");
+                return ResponseEntity.badRequest()
+                    .body(result);
+            }
+        } else {
             Cycletask cycletask = new Cycletask();
             cycletask.setCycle(jsonObject.getString("cycle"));
             cycletask.setName(task.getName());

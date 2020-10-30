@@ -10,6 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -71,5 +76,26 @@ public class LoginfoService {
     public void delete(Long id) {
         log.debug("Request to delete Loginfo : {}", id);
         loginfoRepository.deleteById(id);
+    }
+
+    public List<Loginfo> findall(String startime, String endtime) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        startime = startime+" 00:00:00";
+        endtime = endtime+" 00:00:00";
+
+        Date a = sdf.parse(startime);
+        Date b = sdf.parse(endtime);
+
+        List<Loginfo> res = new ArrayList<>();
+        List<Loginfo> loginfoList =  loginfoRepository.findAll();
+
+        for (Loginfo logs: loginfoList) {
+            Date event = sdf.parse(logs.getEventime());
+            if(event.compareTo(a)>=0 && event.compareTo(b)<0) {
+                res.add(logs);
+            }
+
+        }
+        return res;
     }
 }
