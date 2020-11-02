@@ -13,5 +13,6 @@ import java.util.Map;
 @SuppressWarnings("unused")
 @Repository
 public interface MaprelationRepository extends JpaRepository<Maprelation, Long>, JpaSpecificationExecutor<Maprelation> {
+    List<Maprelation> findAllByStatus(String status);
 
 }

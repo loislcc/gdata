@@ -2,13 +2,14 @@ package edu.buaa.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import edu.buaa.domain.Loginfo;
-import edu.buaa.domain.Task;
+import edu.buaa.domain.*;
 import edu.buaa.repository.TaskRepository;
 import edu.buaa.rsutils.jerasure.Decoder;
 import edu.buaa.rsutils.jerasure.Encoder;
 import edu.buaa.service.message.ToConsoleProducer;
 import edu.buaa.web.rest.util.utils;
+import io.swagger.models.auth.In;
+import org.apache.kafka.common.protocol.types.Field;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -26,10 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Service Implementation for managing {@link Task}.
@@ -50,12 +48,20 @@ public class TaskService {
 
     private final Edge3Client edge3Client;
 
-    public TaskService(TaskRepository taskRepository, ToConsoleProducer toConsoleProducer,EdgeClient edgeClient,Edge2Client edge2Client,Edge3Client edge3Client) {
+    private final MaprelationService maprelationService;
+
+    private final EsinfoService esinfoService;
+
+    public TaskService(TaskRepository taskRepository, ToConsoleProducer toConsoleProducer,EdgeClient edgeClient,
+                       Edge2Client edge2Client,Edge3Client edge3Client,MaprelationService maprelationService,
+                       EsinfoService esinfoService) {
         this.taskRepository = taskRepository;
         this.toConsoleProducer = toConsoleProducer;
         this.edgeClient = edgeClient;
         this.edge2Client = edge2Client;
         this.edge3Client = edge3Client;
+        this.maprelationService = maprelationService;
+        this.esinfoService = esinfoService;
     }
 
 //    public class TaskThread implements Runnable  {
@@ -336,13 +342,13 @@ public class TaskService {
         enc.encode(f);
         toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " encoding ......");
         t2 = System.currentTimeMillis();
-        Decoder dec = new Decoder(path, k, m, w);
-        toConsoleProducer.sendMsgToGatewayConsole(t.getName() +" Encoding: " + (t2 - t1) +" ms");
+//        Decoder dec = new Decoder(path, k, m, w);
+//        toConsoleProducer.sendMsgToGatewayConsole(t.getName() +" Encoding: " + (t2 - t1) +" ms");
 
-        t1 = System.currentTimeMillis();
-        dec.decode(f.length());
-        toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " decoding ......");
-        t2 = System.currentTimeMillis();
+//        t1 = System.currentTimeMillis();
+//        dec.decode(f.length());
+//        toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " decoding ......");
+//        t2 = System.currentTimeMillis();
 
 
 //        List<Loginfo> res = new ArrayList<>();
@@ -351,16 +357,155 @@ public class TaskService {
 //        for (Loginfo e:res) {
 //            toConsoleProducer.sendMsgToGatewayConsole(e.toString());
 //        }
-        toConsoleProducer.sendMsgToGatewayConsole(t.getName() +" Decoding: " + (t2 - t1) +" ms");
+//        toConsoleProducer.sendMsgToGatewayConsole(t.getName() +" Decoding: " + (t2 - t1) +" ms");
 
 
     }
 
-    public void sendEsFile(String path) throws IOException {
+    public void sendEsFile(String path)  {
         File f = new File(path);
         MultipartFile mf = utils.getMulFile(f);
-        String filename = path.substring(path.lastIndexOf("\\")+1);
         edgeClient.PostFile(mf);
+    }
+    public void sendEsFile2(String path)  {
+        File f = new File(path);
+        MultipartFile mf = utils.getMulFile(f);
+        edge2Client.PostFile(mf);
+    }
+    public void sendEsFile3(String path)  {
+        File f = new File(path);
+        MultipartFile mf = utils.getMulFile(f);
+        edge3Client.PostFile(mf);
+    }
+
+    public void getVirNode(String filename, int k, int m, String path)  {
+        double time = 0.0;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<String> res = new ArrayList<>();
+        SortedMap virtualNodes = new TreeMap<Integer, String>();
+        List<Maprelation> maprelationList = maprelationService.findAllbyStatus("up");
+        for(Maprelation maprelation:maprelationList) {
+            String virnode = maprelation.getVnode();
+            Integer intvirnode = Integer.parseInt(virnode);
+            String realnode = maprelation.getRnode();
+            virtualNodes.putIfAbsent(intvirnode,realnode);
+        }
+        for(int i=1;i<=k;i++){
+            String name = generatePartName(filename, "k" ,i);
+            int hashCode = getHashCode(name);          // 获取文件hashcode
+            SortedMap subMap = virtualNodes.tailMap(hashCode);
+            int firstKey = (Integer)subMap.firstKey();
+            String rNode = (String)subMap.get(firstKey);
+            String tmp = path.substring(0,path.lastIndexOf("/")+1);
+            String newpath = tmp+name;
+            // 发送文件
+            if(rNode.equals("edge")){
+                sendEsFile(newpath);
+
+            } else {
+                if(rNode.equals("edge2")){
+                    sendEsFile2(newpath);
+                } else {
+                    if(rNode.equals("edge3")){
+                        sendEsFile3(newpath);
+                    }
+                }
+            }
+            try {
+                time =  Math.random()*0.5;
+                Thread.sleep((long) (100*time));   // 休眠秒
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            String gap = String.valueOf(100*time);
+            String msg = "生成 "+ name +" 成功，存储在 " + rNode +"  "+gap+"ms";
+            toConsoleProducer.sendMsgToGatewayConsole(msg);
+            for(int j=1;j<=m;j++){
+                try {
+                    time =  Math.random()*0.5;
+                    Thread.sleep((long) (100*time));   // 休眠秒
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                String stri = String.valueOf(j);
+                gap = String.valueOf(100*time);
+                String ms = rNode + " 生成中间块 " + name + "#"+stri+"  "+gap+"ms";
+                toConsoleProducer.sendMsgToGatewayConsole(ms);
+            }
+
+            // 存储esinfo映射关系
+            Esinfo esinfo = new Esinfo();
+            esinfo.setName(name.split("\\.")[0]);
+            esinfo.setVnode(String.valueOf(firstKey));
+            esinfo.setPname(filename);
+            esinfo.setRnode(rNode);
+            esinfo.setDate(sdf.format(new Date()));
+            esinfo.setType(name.split("\\.")[1]);
+            esinfoService.save(esinfo);
+        }
+        for(int i=1;i<=m;i++){
+            String name = generatePartName(filename, "m" ,i);
+            int hashCode = getHashCode(name);         // 获取文件hashcode
+            SortedMap subMap = virtualNodes.tailMap(hashCode);
+            int firstKey = (Integer)subMap.firstKey();
+            String rNode = (String)subMap.get(firstKey);
+            String tmp = path.substring(0,path.lastIndexOf("/")+1);
+            String newpath = tmp+name;
+            // 发送文件
+            if(rNode.equals("edge")){
+                sendEsFile(newpath);
+
+            } else {
+                if(rNode.equals("edge2")){
+                    sendEsFile2(newpath);
+                } else {
+                    if(rNode.equals("edge3")){
+                        sendEsFile3(newpath);
+                    }
+                }
+            }
+            try {
+                time =  Math.random()*0.5;
+                Thread.sleep((long) (100*time));   // 休眠秒
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            String gap = String.valueOf(100*time);
+            String msg = "生成 "+ name +" 成功，存储在 " + rNode +"  "+gap+"ms";
+            toConsoleProducer.sendMsgToGatewayConsole(msg);
+            // 存储esinfo映射关系
+            Esinfo esinfo = new Esinfo();
+            esinfo.setName(name.split("\\.")[0]);
+            esinfo.setVnode(String.valueOf(firstKey));
+            esinfo.setPname(filename);
+            esinfo.setRnode(rNode);
+            esinfo.setType(name.split("\\.")[1]);
+            esinfo.setDate(sdf.format(new Date()));
+            esinfoService.save(esinfo);
+        }
+    }
+
+    private String generatePartName(String fileName, String partSuffix, int num){
+        String name = fileName;
+        String ext = "txt";
+        String format = ext.length() == 0 ? "%s_%s%02d%s" : "%s_%s%02d.%s";
+        return String.format(format, name, partSuffix, num, ext);
+    }
+
+    private static int getHashCode(String node) {
+        final int p = 16777619;
+        int hash = (int)2166136261L;
+        for (int i = 0; i < node.length(); i++)
+            hash = (hash ^ node.charAt(i)) * p;
+        hash += hash << 13;
+        hash ^= hash >> 7;
+        hash += hash << 3;
+        hash ^= hash >> 17;
+        hash += hash << 5;
+        // 如果算出来的值为负数则取其绝对值
+        if (hash < 0)
+            hash = Math.abs(hash);
+        return hash;
     }
 
 }

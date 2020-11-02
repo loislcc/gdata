@@ -117,37 +117,35 @@ public class TaskResource {
             String path = "";
             try {
                 List<Loginfo> loginfoList = loginfoService.findall(startime,endtime);                  // 获取指定范围内信息
-                if(loginfoList.size()!=0){
-                    File testDir = new File(Constants.filepath+day.format(new Date()));
-                    if (!testDir.isDirectory()) {
-                        testDir.mkdir();
-                    }
-                    path = Constants.filepath + day.format(new Date()) + "/" + t.getName()+".txt";         // 文件路径
-                    utils.FileWriteListneed(path,loginfoList);                                            // 写入文件
-                } else {
-                    taskService.delete(t.getId());
-                    toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " 没有相关信息可备份,该任务删除");
-                    throw new NumberFormatException();
+                File testDir = new File(Constants.filepath+day.format(new Date()));
+                if (!testDir.isDirectory()) {
+                    testDir.mkdir();
                 }
-            } catch (NumberFormatException e) {
-                this.errRet.add("没有相关信息可备份,该任务删除");
+                path = Constants.filepath + day.format(new Date()) + "/" + t.getName()+".txt";         // 文件路径
+                utils.FileWriteListneed(path,loginfoList);                                            // 写入文件
 
+                toConsoleProducer.sendMsgToGatewayConsole("成功写入文件: "+path);
+                if(isPause()){
+                    t.setStatus("pause");
+                    taskService.save(t);
+                    toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " 任务已暂停");
+                }
+                // 编码
+                taskService.executeTask(t, path );
+
+                int k = Integer.parseInt(t.getDatanum());
+                int m = Integer.parseInt(t.getChecknum());
+
+                // 选择节点进行发送
+                taskService.getVirNode(t.getName(),k,m,path);
+
+                t.setStatus("finish");
+                taskService.save(t);
             } catch (Exception e) {
                 t.setStatus("fail");
                 taskService.save(t);
-                toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " 写入文件失败");
+                toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " 任务失败");
             }
-            toConsoleProducer.sendMsgToGatewayConsole("成功写入文件: "+path);
-            if(isPause()){
-                t.setStatus("pause");
-                taskService.save(t);
-                toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " 任务已暂停");
-            }
-            // 编码
-
-            taskService.executeTask(t, path );
-
-            // 选择节点进行发送
 
         }
         public void pause() {
@@ -284,6 +282,14 @@ public class TaskResource {
     @PostMapping("/tasks/add")
     public ResponseEntity<JSONObject> importTask(@RequestBody JSONObject jsonObject) throws Exception {
         log.debug("REST request to add taskinfo : {}", jsonObject);
+        String startime = jsonObject.getString("startime");
+        String endtime = jsonObject.getString("endtime");
+        List<Loginfo> loginfoList = loginfoService.findall(startime,endtime);                  // 获取指定范围内信息
+        if(loginfoList.size()==0){
+            JSONObject result = new JSONObject();
+            result.put("errorinfo", "没有相关信息可备份,该任务删除");
+            return ResponseEntity.badRequest().body(result);
+        }
         Task task = new Task();
         task.setChecknum(jsonObject.getString("checknum"));
         task.setDatanum(jsonObject.getString("datanum"));
@@ -295,24 +301,7 @@ public class TaskResource {
         task.setType(jsonObject.getString("type"));
         task.setStatus(jsonObject.getString("status"));
         Task task1 = taskService.save(task);
-        if(!task.getType().equals("cycle")){
-            Vector<String> errRet = new Vector();
-            TaskThread thread= taskMap.get(task.getId());
-            if (thread == null) {
-                thread  = new TaskThread(task, errRet);
-                taskMap.put(task.getId(), thread);
-            }
-            forkJoinPool.execute(thread);
-            forkJoinPool.shutdown();
-            forkJoinPool.awaitTermination(1, TimeUnit.DAYS);
-
-            if (errRet.size() > 0) {
-                JSONObject result = new JSONObject();
-                result.put("errorinfo", "没有相关信息可备份,该任务删除");
-                return ResponseEntity.badRequest()
-                    .body(result);
-            }
-        } else {
+        if(task.getType().equals("cycle")){
             Cycletask cycletask = new Cycletask();
             cycletask.setCycle(jsonObject.getString("cycle"));
             cycletask.setName(task.getName());
@@ -321,6 +310,30 @@ public class TaskResource {
             cycletaskService.save(cycletask);
 //            cycletask.setNextime();
         }
+        JSONObject res = new JSONObject();
+        res.put("id", task1.getId());
+        return ResponseEntity.ok().body(res);
+    }
+
+    @PostMapping("/tasks/addrun")
+    public ResponseEntity<JSONObject> runTask(@RequestBody Long id) throws Exception {
+           Optional<Task> taskOptional = taskService.findOne(id);
+           if(taskOptional.isPresent()) {
+               Task task = taskOptional.get();
+               Vector<String> errRet = new Vector();
+               TaskThread thread= taskMap.get(task.getId());
+               if (thread == null) {
+                   thread  = new TaskThread(task, errRet);
+                   taskMap.put(task.getId(), thread);
+               }
+               forkJoinPool.execute(thread);
+//               forkJoinPool.shutdown();
+//               forkJoinPool.awaitTermination(1, TimeUnit.DAYS);
+           } else {
+               JSONObject result = new JSONObject();
+               result.put("errorinfo", "任务查找失败");
+               return ResponseEntity.badRequest().body(result);
+           }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -350,15 +363,8 @@ public class TaskResource {
     @GetMapping("/test")
     public ResponseEntity<JSONObject> test()  {
         String path = "/Users/lois/Desktop/ErasureCode/2020-10-30/test1.txt";
-        try {
             taskService.sendEsFile(path);
-        } catch (IOException e) {
-            JSONObject result = new JSONObject();
-            result.put("errorinfo", "发送文件失败");
-//            toConsoleProducer.sendMsgToGatewayConsole("发送文件失败");
-            return ResponseEntity.badRequest()
-                .body(result);
-        }
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

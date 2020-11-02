@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -71,5 +73,10 @@ public class MaprelationService {
     public void delete(Long id) {
         log.debug("Request to delete Maprelation : {}", id);
         maprelationRepository.deleteById(id);
+    }
+
+
+    public List<Maprelation> findAllbyStatus(String status){
+        return maprelationRepository.findAllByStatus(status);
     }
 }
