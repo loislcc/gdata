@@ -358,7 +358,7 @@ public class TaskService {
 
     public void sendEsFile(String path) throws IOException {
         File f = new File(path);
-        MultipartFile mf = utils.fileToMulti(f);
+        MultipartFile mf = utils.getMulFile(f);
         String filename = path.substring(path.lastIndexOf("\\")+1);
         edgeClient.PostFile(mf);
     }

@@ -1,8 +1,12 @@
 package edu.buaa.web.rest.util;
 
 import edu.buaa.domain.Loginfo;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -287,5 +291,40 @@ public final class utils {
         InputStream inputStream = new FileInputStream(f);
         MultipartFile multipartFile = new MockMultipartFile(f.getName(), inputStream);
         return multipartFile;
+    }
+
+    public static MultipartFile getMulFile(File file) {
+        FileItem fileItem = createFileItem(file);
+        MultipartFile mfile = new CommonsMultipartFile(fileItem);
+        return mfile;
+    }
+
+    public static FileItem createFileItem(File file)
+    {
+        String filePath = file.getPath();
+        FileItemFactory factory = new DiskFileItemFactory(16, null);
+        String textFieldName = "file";
+        int num = filePath.lastIndexOf(".");
+        String extFile = filePath.substring(num);
+        FileItem item = factory.createItem(textFieldName, "multipart/form-data", true,
+            file.getName());
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        try
+        {
+            FileInputStream fis = new FileInputStream(file);
+            OutputStream os = item.getOutputStream();
+            while ((bytesRead = fis.read(buffer, 0, 8192))
+                != -1)
+            {
+                os.write(buffer, 0, bytesRead);
+            }
+            os.close();
+            fis.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+        return item;
     }
 }
