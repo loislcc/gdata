@@ -44,9 +44,18 @@ public class TaskService {
 
     private final ToConsoleProducer toConsoleProducer;
 
-    public TaskService(TaskRepository taskRepository, ToConsoleProducer toConsoleProducer) {
+    private final EdgeClient edgeClient;
+
+    private final Edge2Client edge2Client;
+
+    private final Edge3Client edge3Client;
+
+    public TaskService(TaskRepository taskRepository, ToConsoleProducer toConsoleProducer,EdgeClient edgeClient,Edge2Client edge2Client,Edge3Client edge3Client) {
         this.taskRepository = taskRepository;
         this.toConsoleProducer = toConsoleProducer;
+        this.edgeClient = edgeClient;
+        this.edge2Client = edge2Client;
+        this.edge3Client = edge3Client;
     }
 
 //    public class TaskThread implements Runnable  {
@@ -346,4 +355,12 @@ public class TaskService {
 
 
     }
+
+    public void sendEsFile(String path) throws IOException {
+        File f = new File(path);
+        MultipartFile mf = utils.fileToMulti(f);
+        String filename = path.substring(path.lastIndexOf("\\")+1);
+        edgeClient.PostFile(mf);
+    }
+
 }

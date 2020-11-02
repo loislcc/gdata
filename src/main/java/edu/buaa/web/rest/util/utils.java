@@ -1,6 +1,8 @@
 package edu.buaa.web.rest.util;
 
 import edu.buaa.domain.Loginfo;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -277,5 +279,13 @@ public final class utils {
             e.printStackTrace();
         }
         return buffer.toString();
+    }
+
+
+
+    public static MultipartFile fileToMulti(File f) throws IOException {
+        InputStream inputStream = new FileInputStream(f);
+        MultipartFile multipartFile = new MockMultipartFile(f.getName(), inputStream);
+        return multipartFile;
     }
 }

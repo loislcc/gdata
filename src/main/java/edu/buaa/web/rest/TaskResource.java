@@ -346,4 +346,19 @@ public class TaskResource {
         toConsoleProducer.sendMsgToGatewayConsole(str);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/test")
+    public ResponseEntity<JSONObject> test()  {
+        String path = "/Users/lois/Desktop/ErasureCode/2020-10-30/test1.txt";
+        try {
+            taskService.sendEsFile(path);
+        } catch (IOException e) {
+            JSONObject result = new JSONObject();
+            result.put("errorinfo", "发送文件失败");
+//            toConsoleProducer.sendMsgToGatewayConsole("发送文件失败");
+            return ResponseEntity.badRequest()
+                .body(result);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
