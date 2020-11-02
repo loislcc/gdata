@@ -379,7 +379,10 @@ public class TaskService {
     }
 
     public void getVirNode(String filename, int k, int m, String path)  {
-        double time = 0.0;
+        int time = 0;
+        int MAX = 40;
+        int MIN = 20;
+        Random rand = new Random();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<String> res = new ArrayList<>();
         SortedMap virtualNodes = new TreeMap<Integer, String>();
@@ -412,23 +415,23 @@ public class TaskService {
                 }
             }
             try {
-                time =  Math.random()*0.5;
-                Thread.sleep((long) (100*time));   // 休眠秒
+                time =rand.nextInt(MAX - MIN + 1) + MIN; //
+                Thread.sleep(time);   // 休眠秒
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            String gap = String.valueOf(100*time);
+            String gap = String.valueOf(time);
             String msg = "生成 "+ name +" 成功，存储在 " + rNode +"  "+gap+"ms";
             toConsoleProducer.sendMsgToGatewayConsole(msg);
             for(int j=1;j<=m;j++){
                 try {
-                    time =  Math.random()*0.5;
-                    Thread.sleep((long) (100*time));   // 休眠秒
+                    time =rand.nextInt(MAX - MIN + 1) + MIN; //
+                    Thread.sleep(time);   // 休眠秒
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 String stri = String.valueOf(j);
-                gap = String.valueOf(100*time);
+                gap = String.valueOf(time);
                 String ms = rNode + " 生成中间块 " + name + "#"+stri+"  "+gap+"ms";
                 toConsoleProducer.sendMsgToGatewayConsole(ms);
             }
@@ -465,12 +468,12 @@ public class TaskService {
                 }
             }
             try {
-                time =  Math.random()*0.5;
-                Thread.sleep((long) (100*time));   // 休眠秒
+                time  =rand.nextInt(MAX - MIN + 1) + MIN; //
+                Thread.sleep(time);   // 休眠秒
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            String gap = String.valueOf(100*time);
+            String gap = String.valueOf(time);
             String msg = "生成 "+ name +" 成功，存储在 " + rNode +"  "+gap+"ms";
             toConsoleProducer.sendMsgToGatewayConsole(msg);
             // 存储esinfo映射关系
