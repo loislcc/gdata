@@ -1,7 +1,9 @@
 package edu.buaa.service;
 
+import edu.buaa.domain.Constants;
 import edu.buaa.domain.Esinfo;
 import edu.buaa.repository.EsinfoRepository;
+import edu.buaa.web.rest.util.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -23,8 +28,18 @@ public class EsinfoService {
 
     private final EsinfoRepository esinfoRepository;
 
-    public EsinfoService(EsinfoRepository esinfoRepository) {
+    private final EdgeClient edgeClient;
+
+    private final Edge2Client edge2Client;
+
+    private final Edge3Client edge3Client;
+
+
+    public EsinfoService(EsinfoRepository esinfoRepository, EdgeClient edgeClient, Edge2Client edge2Client, Edge3Client edge3Client) {
         this.esinfoRepository = esinfoRepository;
+        this.edgeClient = edgeClient;
+        this.edge2Client = edge2Client;
+        this.edge3Client = edge3Client;
     }
 
     /**
@@ -71,5 +86,31 @@ public class EsinfoService {
     public void delete(Long id) {
         log.debug("Request to delete Esinfo : {}", id);
         esinfoRepository.deleteById(id);
+    }
+
+    public void getEsFile(String name)  {
+        edgeClient.getFile(name);
+    }
+
+    public String storeFile(MultipartFile multipartFile, String pname) {
+        String path = Constants.esfilepathtotmp+pname;
+        File file = new  File ( path );
+        String filename = multipartFile.getOriginalFilename();
+        String  pathFile = path + File.separator + filename;
+        File  newFile = new  File(pathFile);
+        //判断文件夹是否存在，不存在则创建
+        if( !file.exists( ) ){
+            //创建文件夹
+            file.mkdirs();
+        }
+        try{
+            //文件传输到本地
+            multipartFile.transferTo(newFile);
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return pathFile;
+
     }
 }

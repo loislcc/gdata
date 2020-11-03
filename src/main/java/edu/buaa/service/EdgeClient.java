@@ -15,4 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface EdgeClient {
     @RequestMapping(value = "/api/PostFile",method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<JSONObject> PostFile(@RequestPart("file") MultipartFile files);
+
+    @RequestMapping(value = "/api/getFile",method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<JSONObject> getFile(@RequestParam("name") String name);
 }

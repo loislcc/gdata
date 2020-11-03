@@ -56,7 +56,7 @@ public class ShareNotiConsumer {
                     }
                 }
                 if(!flag){
-                    for(int i=0; i<1; i++) {
+                    for(int i=0; i<4; i++) {
                         // 计算虚拟节点
                         String vitualNode = msg.getBody().split("!")[1] + msg.getOwner() + "vn" + i;  // body存的是ip
                         int hashCode = getHashCode(vitualNode);

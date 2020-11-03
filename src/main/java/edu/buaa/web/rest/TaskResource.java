@@ -360,10 +360,10 @@ public class TaskResource {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/test")
+    @GetMapping("/tasks/test")
     public ResponseEntity<JSONObject> test()  {
-        String path = "/Users/lois/Desktop/ErasureCode/2020-10-30/test1.txt";
-            taskService.sendEsFile(path);
+//        String path = "/Users/lois/Desktop/ErasureCode/2020-10-30/test1.txt";
+//            taskService.sendEsFile(path);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

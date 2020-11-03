@@ -1,5 +1,7 @@
 package edu.buaa.web.rest;
 
+import com.alibaba.fastjson.JSONObject;
+import edu.buaa.domain.Constants;
 import edu.buaa.domain.Esinfo;
 import edu.buaa.repository.EsinfoRepository;
 import edu.buaa.service.EsinfoService;
@@ -15,10 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -144,9 +150,65 @@ public class EsinfoResource {
     }
 
     @PostMapping("/esinfos/findByname")
-    public List<Esinfo> findEsinfo(@RequestBody String pname) throws URISyntaxException {
+    public List<Esinfo> findEsinfo(@RequestBody String pname)  {
         log.debug("REST request to find Esinfo bypname : {}", pname);
         Optional<List<Esinfo>> optionalEsinfoList = esinfoRepository.findAllByPname(pname);
         return optionalEsinfoList.orElse(null);
+    }
+
+    @PostMapping("/esinfos/processback")
+    public ResponseEntity<Void> processback(@RequestBody String pname)  {
+        log.debug("REST request to back esinfo : {}", pname);
+        Optional<List<Esinfo>> optionalEsinfoList = esinfoRepository.findAllByPname(pname);
+        if(optionalEsinfoList.isPresent()){
+            List<Esinfo> esinfos = optionalEsinfoList.get();
+            for (Esinfo esinfo: esinfos){
+                String rnode = esinfo.getRnode();
+                String name = esinfo.getName();
+                if(rnode.equals("edge")){
+                    esinfoService.getEsFile(name);
+                }else {
+                    if(rnode.equals("edge2")){
+
+                    }else {
+                        if(rnode.equals("edge3")){
+
+                        }
+                    }
+                }
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/esinfos/test")
+    public ResponseEntity<JSONObject> test()  {
+//        String path = "/Users/lois/Desktop/ErasureCode/2020-10-30/test1.txt";
+//            taskService.sendEsFile(path);
+        esinfoService.getEsFile("tsk1103_k01");
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/esinfos/FiletoGateway")
+    public ResponseEntity<JSONObject> postFiletoGateway(@RequestParam("file") MultipartFile files) throws Exception {
+        String filename = files.getOriginalFilename();
+        String pname = filename.split("_")[0];
+        String path = Constants.esfilepathtotmp+File.separator+pname;
+        File file = new  File ( path );
+        String  pathFile = path + File.separator + filename;
+        File  newFile = new  File(pathFile);
+        //判断文件夹是否存在，不存在则创建
+        if( !file.exists( ) ){
+            //创建文件夹
+            file.mkdirs();
+        }
+        try{
+            //文件传输到本地
+            files.transferTo(newFile);
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
