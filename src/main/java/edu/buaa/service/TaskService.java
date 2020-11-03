@@ -327,14 +327,19 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
+    public Optional<Task> findbyName(String name) {
+        log.debug("Request to get Task : {}", name);
+        return taskRepository.findByName(name);
+    }
 
 
 
-    public  synchronized void executeTask(Task t, String path) {
+
+    public  synchronized Long executeTask(Task t, String path) {
         long t1,t2;
         int k = Integer.parseInt(t.getDatanum());
         int m = Integer.parseInt(t.getChecknum());
-        int w = 8;
+        int w = Constants.jerasurew;
         File f  = new File(path);
         Encoder enc = new Encoder(k, m, w);
 
@@ -359,7 +364,7 @@ public class TaskService {
 //        }
 //        toConsoleProducer.sendMsgToGatewayConsole(t.getName() +" Decoding: " + (t2 - t1) +" ms");
 
-
+            return f.length();
     }
 
     public void sendEsFile(String path)  {

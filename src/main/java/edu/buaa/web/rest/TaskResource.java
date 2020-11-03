@@ -131,7 +131,7 @@ public class TaskResource {
                     toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " 任务已暂停");
                 }
                 // 编码
-                taskService.executeTask(t, path );
+                Long size = taskService.executeTask(t, path );
 
                 int k = Integer.parseInt(t.getDatanum());
                 int m = Integer.parseInt(t.getChecknum());
@@ -139,6 +139,7 @@ public class TaskResource {
                 // 选择节点进行发送
                 taskService.getVirNode(t.getName(),k,m,path);
 
+                t.setSize(size);
                 t.setStatus("finish");
                 taskService.save(t);
             } catch (Exception e) {

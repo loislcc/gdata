@@ -13,4 +13,5 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
+    Optional<Task> findByName(String name);
 }

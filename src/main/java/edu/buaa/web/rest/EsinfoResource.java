@@ -3,14 +3,20 @@ package edu.buaa.web.rest;
 import com.alibaba.fastjson.JSONObject;
 import edu.buaa.domain.Constants;
 import edu.buaa.domain.Esinfo;
+import edu.buaa.domain.Loginfo;
+import edu.buaa.domain.Task;
 import edu.buaa.repository.EsinfoRepository;
+import edu.buaa.rsutils.jerasure.Decoder;
 import edu.buaa.service.EsinfoService;
+import edu.buaa.service.TaskService;
+import edu.buaa.service.message.ToConsoleProducer;
 import edu.buaa.web.rest.errors.BadRequestAlertException;
 import edu.buaa.service.dto.EsinfoCriteria;
 import edu.buaa.service.EsinfoQueryService;
 
 import edu.buaa.web.rest.util.HeaderUtil;
 import edu.buaa.web.rest.util.PaginationUtil;
+import edu.buaa.web.rest.util.utils;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +34,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,10 +55,17 @@ public class EsinfoResource {
 
     private final EsinfoRepository esinfoRepository;
 
-    public EsinfoResource(EsinfoService esinfoService, EsinfoQueryService esinfoQueryService, EsinfoRepository esinfoRepository) {
+    private final TaskService taskService;
+
+    private final ToConsoleProducer toConsoleProducer;
+
+    public EsinfoResource(EsinfoService esinfoService, EsinfoQueryService esinfoQueryService,
+                          EsinfoRepository esinfoRepository,TaskService taskService,ToConsoleProducer toConsoleProducer) {
         this.esinfoService = esinfoService;
         this.esinfoQueryService = esinfoQueryService;
         this.esinfoRepository = esinfoRepository;
+        this.taskService = taskService;
+        this.toConsoleProducer = toConsoleProducer;
     }
 
     /**
@@ -160,6 +174,7 @@ public class EsinfoResource {
     public ResponseEntity<Void> processback(@RequestBody String pname)  {
         log.debug("REST request to back esinfo : {}", pname);
         Optional<List<Esinfo>> optionalEsinfoList = esinfoRepository.findAllByPname(pname);
+        // 从edge获取所有数据块文件
         if(optionalEsinfoList.isPresent()){
             List<Esinfo> esinfos = optionalEsinfoList.get();
             for (Esinfo esinfo: esinfos){
@@ -169,14 +184,32 @@ public class EsinfoResource {
                     esinfoService.getEsFile(name);
                 }else {
                     if(rnode.equals("edge2")){
-
+                        esinfoService.getEsFile2(name);
                     }else {
                         if(rnode.equals("edge3")){
-
+                            esinfoService.getEsFile3(name);
                         }
                     }
                 }
             }
+        }
+//         解码工作
+        Optional<Task> taskOptional = taskService.findbyName(pname);
+        if(taskOptional.isPresent()){
+            Task task = taskOptional.get();
+            int k= Integer.parseInt(task.getDatanum());
+            int m = Integer.parseInt(task.getChecknum());
+            int w = Constants.jerasurew;
+            String path = Constants.esfilepathtotmp+File.separator+pname+File.separator+pname+".txt";
+            Decoder dec = new Decoder(path, k, m, w);
+            dec.decode(task.getSize());
+            List<Loginfo> res = new ArrayList<>();
+            String path2 = path.replace(".txt","back.txt");
+            res = utils.FileInputListneed(path2);
+            for (Loginfo e:res) {
+                toConsoleProducer.sendMsgToGatewayConsole(e.toString());
+            }
+            toConsoleProducer.sendMsgToGatewayConsole(task.getName() +" Decoding " );
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }

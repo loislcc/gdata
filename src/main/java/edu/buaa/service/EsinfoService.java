@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -90,6 +91,12 @@ public class EsinfoService {
 
     public void getEsFile(String name)  {
         edgeClient.getFile(name);
+    }
+    public void getEsFile2(String name)  {
+        edge2Client.getFile(name);
+    }
+    public void getEsFile3(String name)  {
+        edge3Client.getFile(name);
     }
 
     public String storeFile(MultipartFile multipartFile, String pname) {
