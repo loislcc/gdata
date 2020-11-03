@@ -44,6 +44,9 @@ public class Task implements Serializable {
     @Column(name = "matrix")
     private String matrix;
 
+    @Column(name = "size")
+    private Long size;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -169,6 +172,19 @@ public class Task implements Serializable {
     public void setMatrix(String matrix) {
         this.matrix = matrix;
     }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public Task size(Long size) {
+        this.size = size;
+        return this;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -200,6 +216,7 @@ public class Task implements Serializable {
             ", datanum='" + getDatanum() + "'" +
             ", checknum='" + getChecknum() + "'" +
             ", matrix='" + getMatrix() + "'" +
+            ", size=" + getSize() +
             "}";
     }
 }

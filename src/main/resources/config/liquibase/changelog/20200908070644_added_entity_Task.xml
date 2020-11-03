@@ -43,6 +43,9 @@
             <column name="matrix" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="size" type="bigint">
+                <constraints nullable="true" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
     </changeSet>
@@ -75,6 +78,7 @@
             <column name="datanum" type="string"/>
             <column name="checknum" type="string"/>
             <column name="matrix" type="string"/>
+            <column name="size" type="numeric"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
         </loadData>
     </changeSet>

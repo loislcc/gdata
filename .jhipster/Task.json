@@ -38,6 +38,10 @@
         {
             "fieldName": "matrix",
             "fieldType": "String"
+        },
+        {
+            "fieldName": "size",
+            "fieldType": "Long"
         }
     ],
     "changelogDate": "20200908070644",

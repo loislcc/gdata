@@ -44,6 +44,8 @@ public class TaskCriteria implements Serializable, Criteria {
 
     private StringFilter matrix;
 
+    private LongFilter size;
+
     public TaskCriteria(){
     }
 
@@ -58,6 +60,7 @@ public class TaskCriteria implements Serializable, Criteria {
         this.datanum = other.datanum == null ? null : other.datanum.copy();
         this.checknum = other.checknum == null ? null : other.checknum.copy();
         this.matrix = other.matrix == null ? null : other.matrix.copy();
+        this.size = other.size == null ? null : other.size.copy();
     }
 
     @Override
@@ -145,6 +148,14 @@ public class TaskCriteria implements Serializable, Criteria {
         this.matrix = matrix;
     }
 
+    public LongFilter getSize() {
+        return size;
+    }
+
+    public void setSize(LongFilter size) {
+        this.size = size;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -165,7 +176,8 @@ public class TaskCriteria implements Serializable, Criteria {
             Objects.equals(status, that.status) &&
             Objects.equals(datanum, that.datanum) &&
             Objects.equals(checknum, that.checknum) &&
-            Objects.equals(matrix, that.matrix);
+            Objects.equals(matrix, that.matrix) &&
+            Objects.equals(size, that.size);
     }
 
     @Override
@@ -180,7 +192,8 @@ public class TaskCriteria implements Serializable, Criteria {
         status,
         datanum,
         checknum,
-        matrix
+        matrix,
+        size
         );
     }
 
@@ -197,6 +210,7 @@ public class TaskCriteria implements Serializable, Criteria {
                 (datanum != null ? "datanum=" + datanum + ", " : "") +
                 (checknum != null ? "checknum=" + checknum + ", " : "") +
                 (matrix != null ? "matrix=" + matrix + ", " : "") +
+                (size != null ? "size=" + size + ", " : "") +
             "}";
     }
 
