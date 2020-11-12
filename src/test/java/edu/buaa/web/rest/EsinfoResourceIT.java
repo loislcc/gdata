@@ -4,6 +4,7 @@ import edu.buaa.GdataApp;
 import edu.buaa.domain.Esinfo;
 import edu.buaa.repository.EsinfoRepository;
 import edu.buaa.service.EsinfoService;
+import edu.buaa.service.LoginfoService;
 import edu.buaa.service.TaskService;
 import edu.buaa.service.message.ToConsoleProducer;
 import edu.buaa.web.rest.errors.ExceptionTranslator;
@@ -72,6 +73,9 @@ public class EsinfoResourceIT {
     private ToConsoleProducer toConsoleProducer;
 
     @Autowired
+    private  LoginfoService loginfoService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -93,7 +97,7 @@ public class EsinfoResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final EsinfoResource esinfoResource = new EsinfoResource(esinfoService, esinfoQueryService,esinfoRepository,taskService,toConsoleProducer);
+        final EsinfoResource esinfoResource = new EsinfoResource(esinfoService, esinfoQueryService,esinfoRepository,taskService,toConsoleProducer,loginfoService);
         this.restEsinfoMockMvc = MockMvcBuilders.standaloneSetup(esinfoResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

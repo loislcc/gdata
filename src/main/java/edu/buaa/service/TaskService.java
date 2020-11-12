@@ -332,39 +332,15 @@ public class TaskService {
         return taskRepository.findByName(name);
     }
 
-
-
-
     public  synchronized Long executeTask(Task t, String path) {
-        long t1,t2;
         int k = Integer.parseInt(t.getDatanum());
         int m = Integer.parseInt(t.getChecknum());
         int w = Constants.jerasurew;
         File f  = new File(path);
         Encoder enc = new Encoder(k, m, w);
-
-        t1 = System.currentTimeMillis();
         enc.encode(f);
         toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " encoding ......");
-        t2 = System.currentTimeMillis();
-//        Decoder dec = new Decoder(path, k, m, w);
-//        toConsoleProducer.sendMsgToGatewayConsole(t.getName() +" Encoding: " + (t2 - t1) +" ms");
-
-//        t1 = System.currentTimeMillis();
-//        dec.decode(f.length());
-//        toConsoleProducer.sendMsgToGatewayConsole(t.getName() + " decoding ......");
-//        t2 = System.currentTimeMillis();
-
-
-//        List<Loginfo> res = new ArrayList<>();
-//        String path2 = path.replace(".txt","back.txt");
-//        res = utils.FileInputListneed(path2);
-//        for (Loginfo e:res) {
-//            toConsoleProducer.sendMsgToGatewayConsole(e.toString());
-//        }
-//        toConsoleProducer.sendMsgToGatewayConsole(t.getName() +" Decoding: " + (t2 - t1) +" ms");
-
-            return f.length();
+        return f.length();
     }
 
     public void sendEsFile(String path)  {

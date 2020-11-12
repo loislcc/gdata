@@ -8,6 +8,7 @@ import edu.buaa.domain.Task;
 import edu.buaa.repository.EsinfoRepository;
 import edu.buaa.rsutils.jerasure.Decoder;
 import edu.buaa.service.EsinfoService;
+import edu.buaa.service.LoginfoService;
 import edu.buaa.service.TaskService;
 import edu.buaa.service.message.ToConsoleProducer;
 import edu.buaa.web.rest.errors.BadRequestAlertException;
@@ -59,13 +60,17 @@ public class EsinfoResource {
 
     private final ToConsoleProducer toConsoleProducer;
 
+    private final LoginfoService loginfoService;
+
     public EsinfoResource(EsinfoService esinfoService, EsinfoQueryService esinfoQueryService,
-                          EsinfoRepository esinfoRepository,TaskService taskService,ToConsoleProducer toConsoleProducer) {
+                          EsinfoRepository esinfoRepository,TaskService taskService,ToConsoleProducer toConsoleProducer,
+                          LoginfoService loginfoService) {
         this.esinfoService = esinfoService;
         this.esinfoQueryService = esinfoQueryService;
         this.esinfoRepository = esinfoRepository;
         this.taskService = taskService;
         this.toConsoleProducer = toConsoleProducer;
+        this.loginfoService = loginfoService;
     }
 
     /**
@@ -179,7 +184,12 @@ public class EsinfoResource {
             List<Esinfo> esinfos = optionalEsinfoList.get();
             for (Esinfo esinfo: esinfos){
                 String rnode = esinfo.getRnode();
+                String vnode = esinfo.getVnode();
                 String name = esinfo.getName();
+                if(name.contains("_k"))
+                    toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取数据块 " + name);
+                if(name.contains("_m"))
+                    toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取校验块 " + name);
                 if(rnode.equals("edge")){
                     esinfoService.getEsFile(name);
                 }else {
@@ -206,10 +216,11 @@ public class EsinfoResource {
             List<Loginfo> res = new ArrayList<>();
             String path2 = path.replace(".txt","back.txt");
             res = utils.FileInputListneed(path2);
+            toConsoleProducer.sendMsgToGatewayConsole(task.getName() +" 解码完成并写入数据库" );
             for (Loginfo e:res) {
+                loginfoService.save(e);
                 toConsoleProducer.sendMsgToGatewayConsole(e.toString());
             }
-            toConsoleProducer.sendMsgToGatewayConsole(task.getName() +" Decoding " );
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
