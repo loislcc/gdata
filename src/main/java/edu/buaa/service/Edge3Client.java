@@ -18,4 +18,7 @@ public interface Edge3Client {
 
     @RequestMapping(value = "/api/getFile",method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<JSONObject> getFile(@RequestParam("name") String name);
+
+    @RequestMapping(value = "/api/PostFileforimg",method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<JSONObject> PostFileforimg(@RequestPart("uploadfile") MultipartFile files);
 }

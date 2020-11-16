@@ -397,7 +397,7 @@ public class TaskService {
             }
             try {
                 time =rand.nextInt(MAX - MIN + 1) + MIN; //
-                Thread.sleep(time);   // 休眠秒
+                Thread.sleep(time);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -407,7 +407,7 @@ public class TaskService {
             for(int j=1;j<=m;j++){
                 try {
                     time =rand.nextInt(MAX - MIN + 1) + MIN; //
-                    Thread.sleep(time);   // 休眠秒
+                    Thread.sleep(time);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -450,7 +450,7 @@ public class TaskService {
             }
             try {
                 time  =rand.nextInt(MAX - MIN + 1) + MIN; //
-                Thread.sleep(time);   // 休眠秒
+                Thread.sleep(time);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

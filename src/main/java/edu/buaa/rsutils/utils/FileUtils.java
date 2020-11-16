@@ -195,7 +195,7 @@ public class FileUtils {
 		FileOutputStream[] result = new FileOutputStream[numParts];
 		for (int i = 0; i < numParts; i++) {
 			String partName = generatePartPath(filePath, suffix, i+1);
-			System.out.println(partName);
+//			System.out.println(partName);
 			File part = new File(partName);   // 路径下创建
 			try {
 				if (part.exists()) {

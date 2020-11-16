@@ -175,6 +175,7 @@ public class EsinfoResource {
         return optionalEsinfoList.orElse(null);
     }
 
+
     @PostMapping("/esinfos/processback")
     public ResponseEntity<Void> processback(@RequestBody String pname)  {
         log.debug("REST request to back esinfo : {}", pname);
@@ -186,18 +187,26 @@ public class EsinfoResource {
                 String rnode = esinfo.getRnode();
                 String vnode = esinfo.getVnode();
                 String name = esinfo.getName();
-                if(name.contains("_k"))
-                    toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取数据块 " + name);
-                if(name.contains("_m"))
-                    toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取校验块 " + name);
                 if(rnode.equals("edge")){
                     esinfoService.getEsFile(name);
+                    if(name.contains("_k"))
+                        toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取数据块 " + name);
+                    if(name.contains("_m"))
+                        toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取校验块 " + name);
                 }else {
                     if(rnode.equals("edge2")){
                         esinfoService.getEsFile2(name);
+                        if(name.contains("_k"))
+                            toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取数据块 " + name);
+                        if(name.contains("_m"))
+                            toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取校验块 " + name);
                     }else {
                         if(rnode.equals("edge3")){
                             esinfoService.getEsFile3(name);
+                            if(name.contains("_k"))
+                                toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取数据块 " + name);
+                            if(name.contains("_m"))
+                                toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取校验块 " + name);
                         }
                     }
                 }
