@@ -174,10 +174,16 @@ public class EsinfoResource {
         Optional<List<Esinfo>> optionalEsinfoList = esinfoRepository.findAllByPname(pname);
         return optionalEsinfoList.orElse(null);
     }
+    public void printerror(String name,String pname,String vnode,String rnode){
+        if (name.contains("_k"))
+            toConsoleProducer.sendMsgToGatewayConsole(pname + "从 " + vnode + " : " + rnode + " 获取数据块失败");
+        if (name.contains("_m"))
+            toConsoleProducer.sendMsgToGatewayConsole(pname + "从 " + vnode + " : " + rnode + " 获取数据块失败" );
 
+    }
 
     @PostMapping("/esinfos/processback")
-    public ResponseEntity<Void> processback(@RequestBody String pname)  {
+    public ResponseEntity<JSONObject> processback(@RequestBody String pname)  {
         log.debug("REST request to back esinfo : {}", pname);
         Optional<List<Esinfo>> optionalEsinfoList = esinfoRepository.findAllByPname(pname);
         // 从edge获取所有数据块文件
@@ -188,25 +194,42 @@ public class EsinfoResource {
                 String vnode = esinfo.getVnode();
                 String name = esinfo.getName();
                 if(rnode.equals("edge")){
-                    esinfoService.getEsFile(name);
-                    if(name.contains("_k"))
-                        toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取数据块 " + name);
-                    if(name.contains("_m"))
-                        toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取校验块 " + name);
+                    try {
+                        esinfoService.getEsFile(name);
+
+                        if (name.contains("_k"))
+                            toConsoleProducer.sendMsgToGatewayConsole(pname + "从 " + vnode + " : " + rnode + " 获取数据块 " + name);
+                        if (name.contains("_m"))
+                            toConsoleProducer.sendMsgToGatewayConsole(pname + "从 " + vnode + " : " + rnode + " 获取校验块 " + name);
+                    } catch (Exception e){
+                       printerror(name,pname,vnode,rnode);
+                    }
+
                 }else {
                     if(rnode.equals("edge2")){
-                        esinfoService.getEsFile2(name);
-                        if(name.contains("_k"))
-                            toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取数据块 " + name);
-                        if(name.contains("_m"))
-                            toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取校验块 " + name);
-                    }else {
-                        if(rnode.equals("edge3")){
-                            esinfoService.getEsFile3(name);
+                        try {
+                            esinfoService.getEsFile2(name);
+
                             if(name.contains("_k"))
                                 toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取数据块 " + name);
                             if(name.contains("_m"))
                                 toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取校验块 " + name);
+                        } catch (Exception e){
+                            printerror(name,pname,vnode,rnode);
+                        }
+
+                    }else {
+                        if(rnode.equals("edge3")){
+                            try {
+                                esinfoService.getEsFile3(name);
+                                if(name.contains("_k"))
+                                    toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取数据块 " + name);
+                                if(name.contains("_m"))
+                                    toConsoleProducer.sendMsgToGatewayConsole(pname+"从 "+ vnode + " : " + rnode + " 获取校验块 " + name);
+                            } catch (Exception e){
+                                printerror(name,pname,vnode,rnode);
+                            }
+
                         }
                     }
                 }
@@ -221,15 +244,23 @@ public class EsinfoResource {
             int w = Constants.jerasurew;
             String path = Constants.esfilepathtotmp+File.separator+pname+File.separator+pname+".txt";
             Decoder dec = new Decoder(path, k, m, w);
-            dec.decode(task.getSize());
+            try {
+                dec.decode(task.getSize());
+            } catch(Exception e) {
+                toConsoleProducer.sendMsgToGatewayConsole(task.getName() +" 没有足够子块恢复原始数据！" );
+                JSONObject error = new JSONObject();
+                error.put("errorinfo","子块数量不够！");
+                return ResponseEntity.badRequest().body(error);
+            }
+
             List<Loginfo> res = new ArrayList<>();
             String path2 = path.replace(".txt","back.txt");
             res = utils.FileInputListneed(path2);
-            toConsoleProducer.sendMsgToGatewayConsole(task.getName() +" 解码完成并写入数据库" );
             for (Loginfo e:res) {
                 loginfoService.save(e);
                 toConsoleProducer.sendMsgToGatewayConsole(e.toString());
             }
+            toConsoleProducer.sendMsgToGatewayConsole(task.getName() +" 解码完成并写入数据库" );
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }

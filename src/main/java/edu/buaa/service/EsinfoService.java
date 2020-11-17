@@ -1,5 +1,6 @@
 package edu.buaa.service;
 
+import com.alibaba.fastjson.JSONObject;
 import edu.buaa.domain.Constants;
 import edu.buaa.domain.Esinfo;
 import edu.buaa.repository.EsinfoRepository;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,14 +91,18 @@ public class EsinfoService {
         esinfoRepository.deleteById(id);
     }
 
-    public void getEsFile(String name)  {
-        edgeClient.getFile(name);
+    public boolean getEsFile(String name)  {
+       HttpStatus out  = edgeClient.getFile(name).getStatusCode();
+       return out.is2xxSuccessful();
     }
-    public void getEsFile2(String name)  {
-        edge2Client.getFile(name);
+    public boolean getEsFile2(String name)  {
+        HttpStatus out  = edge2Client.getFile(name).getStatusCode();
+        return out.is2xxSuccessful();
+
     }
-    public void getEsFile3(String name)  {
-        edge3Client.getFile(name);
+    public boolean getEsFile3(String name)  {
+        HttpStatus out  = edge3Client.getFile(name).getStatusCode();
+        return out.is2xxSuccessful();
     }
 
     public String storeFile(MultipartFile multipartFile, String pname) {
