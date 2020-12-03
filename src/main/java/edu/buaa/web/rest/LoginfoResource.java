@@ -157,6 +157,14 @@ public class LoginfoResource {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("/loginfos/test")
+    public ResponseEntity<JSONObject> test() {
+        JSONObject res = new JSONObject();
+        res.put("res","ok");
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
     @PostMapping("/loginfos/add")
     public ResponseEntity<JSONObject> importLog(@RequestBody JSONObject jsonObject) throws Exception {
         log.debug("REST request to add loginfo : {}", jsonObject);

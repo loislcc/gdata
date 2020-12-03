@@ -257,10 +257,14 @@ public class EsinfoResource {
             String path2 = path.replace(".txt","back.txt");
             res = utils.FileInputListneed(path2);
             for (Loginfo e:res) {
-                loginfoService.save(e);
+                if(!loginfoService.existbyNameandIp(e.getName(),e.getIp())){
+                    loginfoService.save(e);
+                }
                 toConsoleProducer.sendMsgToGatewayConsole(e.toString());
             }
             toConsoleProducer.sendMsgToGatewayConsole(task.getName() +" 解码完成并写入数据库" );
+            String p = Constants.esfilepathtotmp+File.separator+pname;
+            utils.delZSPic(p);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -269,7 +273,7 @@ public class EsinfoResource {
     public ResponseEntity<JSONObject> test()  {
 //        String path = "/Users/lois/Desktop/ErasureCode/2020-10-30/test1.txt";
 //            taskService.sendEsFile(path);
-        esinfoService.getEsFile("tsk1103_k01");
+        esinfoService.getEsFile("tsk1201_k01");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
