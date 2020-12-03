@@ -29,6 +29,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static edu.buaa.domain.Constants.ep;
+
 /**
  * Service Implementation for managing {@link Task}.
  */
@@ -359,6 +361,31 @@ public class TaskService {
         edge3Client.PostFile(mf);
     }
 
+    public int findRnode(SortedMap<Integer, String> map, int bound, HashMap<Integer, Integer> vnodecapacity) {
+        int firstKey = 0;
+        Iterator it = map.keySet().iterator();
+        boolean flag = false;
+        while (it.hasNext()) {
+            //it.next()得到的是key，tm.get(key)得到obj
+            firstKey = (int) it.next();
+            int size = vnodecapacity.get(firstKey);
+            if(size < bound) {
+                log.debug("size < bound,{},,,{}",size,bound);
+                vnodecapacity.put(firstKey,size+1);
+                flag = true;
+                break;
+            }
+            log.debug("size < bound,{},,,{}",size,bound);
+        }
+        if(!flag){
+            log.debug("not found store first");
+            firstKey = map.firstKey();
+            vnodecapacity.put(firstKey,vnodecapacity.get(firstKey));
+        }
+        return firstKey;
+    }
+
+
     public void getVirNode(String filename, int k, int m, String path)  {
         int time = 0;
         int MAX = 40;
@@ -368,13 +395,19 @@ public class TaskService {
         List<String> res = new ArrayList<>();
         SortedMap virtualNodes = new TreeMap<Integer, String>();
         List<Maprelation> maprelationList = maprelationService.findAllbyStatus("up");
+        HashMap<Integer, Integer> vnodecapacity = new HashMap<>();
         for(Maprelation maprelation:maprelationList) {
             log.debug("*****,{}",maprelation.toString());
             String virnode = maprelation.getVnode();
             Integer intvirnode = Integer.parseInt(virnode);
             String realnode = maprelation.getRnode();
             virtualNodes.putIfAbsent(intvirnode,realnode);
+            vnodecapacity.put(intvirnode, 0);
         }
+        double length = k+m;
+        double aver = length/maprelationList.size();
+        int bound = (int) (aver*(1+ep));
+
         for(int i=1;i<=k;i++){
             String name = generatePartName(filename, "k" ,i);
             int hashCode = getHashCode(name);          // 获取文件hashcode
@@ -385,13 +418,16 @@ public class TaskService {
             log.debug("!!!!subMap,{}",subMap);
             int firstKey;
             String rNode;
+
             if(subMap.size() == 0) {
-                 firstKey = (Integer)virtualNodes.firstKey();
-                 rNode = (String)virtualNodes.get(firstKey);
+                firstKey = findRnode(virtualNodes,bound,vnodecapacity);
+                rNode = (String) virtualNodes.get(firstKey);
+
             } else {
-                 firstKey = (Integer)subMap.firstKey();
-                 rNode = (String)subMap.get(firstKey);
+                firstKey = findRnode(subMap,bound,vnodecapacity);
+                rNode = (String) subMap.get(firstKey);
             }
+
             log.debug("!!!!,{}",rNode);
 
             String tmp = path.substring(0,path.lastIndexOf("/")+1);
@@ -451,13 +487,16 @@ public class TaskService {
             log.debug("!!!!subMap,{}",subMap);
             int firstKey;
             String rNode;
+
             if(subMap.size() == 0) {
-                firstKey = (Integer)virtualNodes.firstKey();
-                rNode = (String)virtualNodes.get(firstKey);
+                firstKey = findRnode(virtualNodes,bound,vnodecapacity);
+                rNode = (String) virtualNodes.get(firstKey);
+
             } else {
-                firstKey = (Integer)subMap.firstKey();
-                rNode = (String)subMap.get(firstKey);
+                firstKey = findRnode(subMap,bound,vnodecapacity);
+                rNode = (String) subMap.get(firstKey);
             }
+
             log.debug("!!!!,{}",rNode);
 
             String tmp = path.substring(0,path.lastIndexOf("/")+1);
