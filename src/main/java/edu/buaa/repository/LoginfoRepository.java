@@ -17,5 +17,5 @@ public interface LoginfoRepository extends JpaRepository<Loginfo, Long>, JpaSpec
     Loginfo findByIpAndType(String ip,String type);
     Boolean existsByTypeAndName(String type, String name);
     Loginfo findByTypeAndName(String type, String name);
-
+    Boolean existsByIpAndName(String ip, String name);
 }

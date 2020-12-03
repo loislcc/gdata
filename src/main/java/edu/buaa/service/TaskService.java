@@ -369,6 +369,7 @@ public class TaskService {
         SortedMap virtualNodes = new TreeMap<Integer, String>();
         List<Maprelation> maprelationList = maprelationService.findAllbyStatus("up");
         for(Maprelation maprelation:maprelationList) {
+            log.debug("*****,{}",maprelation.toString());
             String virnode = maprelation.getVnode();
             Integer intvirnode = Integer.parseInt(virnode);
             String realnode = maprelation.getRnode();
@@ -377,9 +378,22 @@ public class TaskService {
         for(int i=1;i<=k;i++){
             String name = generatePartName(filename, "k" ,i);
             int hashCode = getHashCode(name);          // 获取文件hashcode
+
+            log.debug("!!!!hashcode,{}",hashCode);
+            log.debug("!!!!virtualnodes,{}",virtualNodes);
             SortedMap subMap = virtualNodes.tailMap(hashCode);
-            int firstKey = (Integer)subMap.firstKey();
-            String rNode = (String)subMap.get(firstKey);
+            log.debug("!!!!subMap,{}",subMap);
+            int firstKey;
+            String rNode;
+            if(subMap.size() == 0) {
+                 firstKey = (Integer)virtualNodes.firstKey();
+                 rNode = (String)virtualNodes.get(firstKey);
+            } else {
+                 firstKey = (Integer)subMap.firstKey();
+                 rNode = (String)subMap.get(firstKey);
+            }
+            log.debug("!!!!,{}",rNode);
+
             String tmp = path.substring(0,path.lastIndexOf("/")+1);
             String newpath = tmp+name;
             // 发送文件
@@ -430,9 +444,22 @@ public class TaskService {
         for(int i=1;i<=m;i++){
             String name = generatePartName(filename, "m" ,i);
             int hashCode = getHashCode(name);         // 获取文件hashcode
+
+            log.debug("!!!!hashcode,{}",hashCode);
+            log.debug("!!!!virtualnodes,{}",virtualNodes);
             SortedMap subMap = virtualNodes.tailMap(hashCode);
-            int firstKey = (Integer)subMap.firstKey();
-            String rNode = (String)subMap.get(firstKey);
+            log.debug("!!!!subMap,{}",subMap);
+            int firstKey;
+            String rNode;
+            if(subMap.size() == 0) {
+                firstKey = (Integer)virtualNodes.firstKey();
+                rNode = (String)virtualNodes.get(firstKey);
+            } else {
+                firstKey = (Integer)subMap.firstKey();
+                rNode = (String)subMap.get(firstKey);
+            }
+            log.debug("!!!!,{}",rNode);
+
             String tmp = path.substring(0,path.lastIndexOf("/")+1);
             String newpath = tmp+name;
             // 发送文件

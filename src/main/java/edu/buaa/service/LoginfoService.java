@@ -98,4 +98,10 @@ public class LoginfoService {
         }
         return res;
     }
+
+
+    public Boolean existbyNameandIp(String name, String ip)   {
+        return loginfoRepository.existsByIpAndName(ip,name);
+    }
+
 }
