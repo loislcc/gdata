@@ -4,13 +4,10 @@ import edu.buaa.GdataApp;
 import edu.buaa.domain.Task;
 import edu.buaa.repository.CycletaskRepository;
 import edu.buaa.repository.TaskRepository;
-import edu.buaa.service.CycletaskService;
-import edu.buaa.service.LoginfoService;
-import edu.buaa.service.TaskService;
+import edu.buaa.service.*;
 import edu.buaa.service.message.ToConsoleProducer;
 import edu.buaa.web.rest.errors.ExceptionTranslator;
 import edu.buaa.service.dto.TaskCriteria;
-import edu.buaa.service.TaskQueryService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,6 +74,8 @@ public class TaskResourceIT {
     private ToConsoleProducer toConsoleProducer;
 
     private LoginfoService loginfoService;
+
+    private EsinfoService esinfoService;
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
@@ -99,7 +98,7 @@ public class TaskResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final TaskResource taskResource = new TaskResource(taskService, taskQueryService, cycletaskService,cycletaskRepository,toConsoleProducer, loginfoService);
+        final TaskResource taskResource = new TaskResource(taskService, taskQueryService, cycletaskService,cycletaskRepository,toConsoleProducer, loginfoService,esinfoService);
         this.restTaskMockMvc = MockMvcBuilders.standaloneSetup(taskResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

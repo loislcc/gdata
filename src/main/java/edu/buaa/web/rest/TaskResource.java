@@ -8,13 +8,10 @@ import edu.buaa.domain.Loginfo;
 import edu.buaa.domain.Task;
 import edu.buaa.repository.CycletaskRepository;
 import edu.buaa.repository.TaskRepository;
-import edu.buaa.service.CycletaskService;
-import edu.buaa.service.LoginfoService;
-import edu.buaa.service.TaskService;
+import edu.buaa.service.*;
 import edu.buaa.service.message.ToConsoleProducer;
 import edu.buaa.web.rest.errors.BadRequestAlertException;
 import edu.buaa.service.dto.TaskCriteria;
-import edu.buaa.service.TaskQueryService;
 
 
 import edu.buaa.web.rest.util.HeaderUtil;
@@ -76,6 +73,8 @@ public class TaskResource {
 
     private final LoginfoService loginfoService;
 
+    private final EsinfoService esinfoService;
+
     private static final ForkJoinPool forkJoinPool = new ForkJoinPool();
 
     private static Map<Long, TaskThread> taskMap = new ConcurrentHashMap<Long, TaskThread>();  // 在多线程环境下，使用HashMap进行put操作时存在丢失数据的情况，为了避免这种bug的隐患，强烈建议使用ConcurrentHashMap代替HashMap。
@@ -83,13 +82,14 @@ public class TaskResource {
 
     public TaskResource(TaskService taskService, TaskQueryService taskQueryService, CycletaskService cycletaskService,
                         CycletaskRepository cycletaskRepository, ToConsoleProducer toConsoleProducer,
-                        LoginfoService loginfoService) {
+                        LoginfoService loginfoService, EsinfoService esinfoService) {
         this.taskService = taskService;
         this.taskQueryService = taskQueryService;
         this.cycletaskService = cycletaskService;
         this.cycletaskRepository = cycletaskRepository;
         this.toConsoleProducer = toConsoleProducer;
         this.loginfoService = loginfoService;
+        this.esinfoService = esinfoService;
     }
 
 
@@ -348,7 +348,10 @@ public class TaskResource {
                 if(task.getType().equals("cycle")){
                     cycletaskService.deletebytaskid(aLong);
                 }
+                String tskname = task.getName();
+                esinfoService.deletebypname(tskname);
             }
+
             deleteTask(aLong);
         }
         return new ResponseEntity<>(HttpStatus.OK);

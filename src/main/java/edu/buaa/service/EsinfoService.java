@@ -91,6 +91,11 @@ public class EsinfoService {
         esinfoRepository.deleteById(id);
     }
 
+    public void deletebypname(String pname) {
+        log.debug("Request to delete Esinfo by name : {}",  pname);
+        esinfoRepository.deleteByPname(pname);
+    }
+
     public boolean getEsFile(String name)  {
        HttpStatus out  = edgeClient.getFile(name).getStatusCode();
        return out.is2xxSuccessful();

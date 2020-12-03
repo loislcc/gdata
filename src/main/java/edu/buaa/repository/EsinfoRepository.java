@@ -14,5 +14,5 @@ import java.util.Optional;
 @Repository
 public interface EsinfoRepository extends JpaRepository<Esinfo, Long>, JpaSpecificationExecutor<Esinfo> {
     Optional<List<Esinfo>> findAllByPname(String pname);
-
+    Optional<Esinfo> deleteByPname(String pname);
 }
